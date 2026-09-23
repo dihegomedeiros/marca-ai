@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marca aí — beleza perto de você</title>
+<link rel="manifest" id="manifest-link">
+<meta name="theme-color" content="#14161F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Marca aí">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+
+    --bg:#FBF1E2;
+    --surface:#FFFDF7;
+    --surface-2:#F2E6D2;
+    --ink:#1D1B15;
+    --ink-muted:#79705E;
+    --border:rgba(29,27,21,0.10);
+    --amber:#C97A1F;
+    --amber-soft:#F1C989;
+    --rose:#B8536A;
+    --rose-soft:#F0C3CE;
+    --success:#3F7D57;
+    --success-soft:#CFE7D7;
+    --shadow: 0 18px 40px -22px rgba(29,27,21,0.35);
+    --nav-h: 72px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161F;
+      --surface:#1C1F2C;
+      --surface-2:#262A3B;
+      --ink:#F3ECDD;
+      --ink-muted:#A39CB0;
+      --border:rgba(243,236,221,0.10);
+      --amber:#EFB454;
+      --amber-soft:#4A3A1E;
+      --rose:#E68CA0;
+      --rose-soft:#402530;
+      --success:#6FC08D;
+      --success-soft:#1E362A;
+      --shadow: 0 18px 44px -18px rgba(0,0,0,0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161F;
+    --surface:#1C1F2C;
+    --surface-2:#262A3B;
+    --ink:#F3ECDD;
+    --ink-muted:#A39CB0;
+    --border:rgba(243,236,221,0.10);
+    --amber:#EFB454;
+    --amber-soft:#4A3A1E;
+    --rose:#E68CA0;
+    --rose-soft:#402530;
+    --success:#6FC08D;
+    --success-soft:#1E362A;
+    --shadow: 0 18px 44px -18px rgba(0,0,0,0.6);
+    color-scheme: dark;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0; height:100%; background:var(--bg); color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none;
+  }
+  h1,h2,h3,.display{ font-family:'Fraunces',Georgia,'Times New Roman',serif; letter-spacing:-0.01em; margin:0; }
+  #app{ max-width:480px; margin:0 auto; min-height:100%; position:relative; padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 12px); }
+  a{color:inherit;}
+  button{font-family:inherit;}
+
+  .screen{ animation: fadein .28s ease; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+  @media (prefers-reduced-motion: reduce){ .screen{animation:none;} *{transition:none !important; animation-duration:.01ms !important;} }
+
+  /* ---- top bar ---- */
+  .topbar{ position:sticky; top:0; z-index:5; background:var(--bg); padding:calc(16px + env(safe-area-inset-top,0px)) 20px 10px; }
+  .location-pill{ display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink-muted); background:none; border:none; padding:0; cursor:pointer; }
+  .location-pill b{ color:var(--ink); font-weight:600; }
+  .topbar-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .back-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none; }
+  .back-btn svg{ width:18px; height:18px; stroke:var(--ink); }
+
+  .page-pad{ padding:0 20px; }
+
+  /* ---- category grid ---- */
+  .cat-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:14px; }
+  .cat-item{ display:flex; flex-direction:column; align-items:center; gap:6px; background:none; border:none; cursor:pointer; padding:6px 2px; }
+  .cat-icon{ width:52px; height:52px; border-radius:18px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:22px; }
+  .cat-item.active .cat-icon{ background:var(--amber); border-color:var(--amber); }
+  .cat-label{ font-size:10.5px; color:var(--ink-muted); text-align:center; line-height:1.2; }
+  .cat-item.active .cat-label{ color:var(--ink); font-weight:600; }
+
+  .filter-chip{ display:inline-flex; align-items:center; gap:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:100px; padding:7px 8px 7px 14px; font-size:13.5px; font-weight:600; margin-top:14px; }
+  .filter-chip button{ width:20px; height:20px; border-radius:50%; border:none; background:var(--ink); color:var(--bg); display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; }
+
+  .section-title{ font-size:19px; font-weight:600; margin:26px 0 12px; display:flex; align-items:baseline; justify-content:space-between; }
+  .section-title span.count{ font-family:'Inter'; font-size:12.5px; color:var(--ink-muted); font-weight:500; }
+
+  /* subcategory list */
+  .sub-list{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+  .sub-row{ display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px 16px; cursor:pointer; text-align:left; width:100%; }
+  .sub-row .swatch{ width:8px; height:38px; border-radius:6px; background:var(--amber); flex:none; }
+  .sub-row .txt{ flex:1; min-width:0; }
+  .sub-row .txt b{ display:block; font-size:15px; font-weight:600; }
+  .sub-row .txt small{ display:block; font-size:12.5px; color:var(--ink-muted); margin-top:2px; }
+  .sub-row .cnt{ font-size:12px; color:var(--ink-muted); flex:none; }
+  .sub-row .chev{ flex:none; opacity:.5; }
+  .sub-row .chev svg{ width:16px; height:16px; }
+
+  /* professional card */
+  .pro-list{ display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+  .pro-card{ background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:16px; box-shadow:var(--shadow); cursor:pointer; }
+  .pro-top{ display:flex; gap:12px; }
+  .avatar{ width:52px; height:52px; border-radius:15px; flex:none; display:flex; align-items:center; justify-content:center; font-family:'Fraunces'; font-weight:600; font-size:17px; color:#fff; }
+  .pro-info{ flex:1; min-width:0; }
+  .pro-info .name{ font-size:15.5px; font-weight:600; }
+  .pro-info .role{ font-size:12.5px; color:var(--ink-muted); margin-top:1px; }
+  .pro-meta{ display:flex; align-items:center; gap:5px; font-size:12.5px; color:var(--ink-muted); margin-top:6px; }
+  .pro-meta .dot{ width:3px; height:3px; border-radius:50%; background:var(--ink-muted); }
+  .star{ color:var(--amber); }
+  .pro-bottom{ display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+  .slot-pill{ font-size:12.5px; color:var(--success); background:var(--success-soft); border-radius:100px; padding:5px 11px; font-weight:600; }
+  .price-tag{ font-size:15px; font-weight:700; }
+  .price-tag small{ font-weight:500; color:var(--ink-muted); font-size:11.5px; }
+
+  /* buttons */
+  .btn-primary{ background:var(--ink); color:var(--bg); border:none; border-radius:14px; padding:15px; font-size:15px; font-weight:600; cursor:pointer; width:100%; }
+  .btn-primary:active{ transform:scale(.98); }
+  .btn-ghost{ background:none; border:1px solid var(--border); color:var(--ink); border-radius:14px; padding:14px; font-size:14px; font-weight:600; cursor:pointer; width:100%; }
+  .btn-small{ background:var(--ink); color:var(--bg); border:none; border-radius:11px; padding:9px 14px; font-size:12.5px; font-weight:600; cursor:pointer; }
+
+  /* professional profile / booking */
+  .profile-hero{ display:flex; gap:14px; align-items:center; margin-top:8px; }
+  .avatar-lg{ width:74px; height:74px; border-radius:22px; font-size:24px; }
+  .tag-row{ display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+  .tag{ font-size:11.5px; background:var(--surface-2); border-radius:100px; padding:5px 11px; font-weight:500; color:var(--ink-muted); }
+
+  .service-card{ margin-top:20px; background:var(--surface-2); border-radius:16px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; }
+  .service-card b{font-size:14.5px;}
+  .service-card small{ display:block; color:var(--ink-muted); font-size:12px; margin-top:2px;}
+
+  .date-scroll{ display:flex; gap:8px; overflow-x:auto; margin-top:12px; padding-bottom:4px; scrollbar-width:none; }
+  .date-scroll::-webkit-scrollbar{ display:none; }
+  .date-chip{ flex:none; width:56px; padding:10px 0; border-radius:14px; border:1px solid var(--border); background:var(--surface); text-align:center; cursor:pointer; }
+  .date-chip .dow{ font-size:11px; color:var(--ink-muted); text-transform:lowercase; }
+  .date-chip .dnum{ font-size:16px; font-weight:700; margin-top:2px; }
+  .date-chip.active{ background:var(--ink); border-color:var(--ink); }
+  .date-chip.active .dow,.date-chip.active .dnum{ color:var(--bg); }
+
+  .time-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+  .time-chip{ padding:11px 0; text-align:center; border-radius:12px; border:1px solid var(--border); background:var(--surface); font-size:13.5px; font-weight:600; cursor:pointer; }
+  .time-chip.active{ background:var(--amber); border-color:var(--amber); color:#241804; }
+  .time-chip:disabled{ opacity:.35; cursor:not-allowed; text-decoration:line-through; }
+
+  .sticky-cta{ position:sticky; bottom:0; background:linear-gradient(to top, var(--bg) 70%, transparent); padding:18px 20px calc(18px + env(safe-area-inset-bottom,0px)); margin-top:14px; }
+  .sticky-cta-inner{ display:flex; align-items:center; gap:12px; }
+  .sticky-cta .amount{ flex:none; }
+  .sticky-cta .amount b{ display:block; font-size:17px; }
+  .sticky-cta .amount small{ color:var(--ink-muted); font-size:11.5px; }
+
+  /* payment */
+  .summary-card{ background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:16px; margin-top:16px; }
+  .summary-row{ display:flex; justify-content:space-between; padding:9px 0; font-size:13.5px; }
+  .summary-row.total{ border-top:1px solid var(--border); margin-top:6px; padding-top:14px; font-weight:700; font-size:15px; }
+  .summary-row .k{ color:var(--ink-muted); }
+
+  .pay-option{ display:flex; align-items:center; gap:12px; border:1.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-top:10px; cursor:pointer; }
+  .pay-option.active{ border-color:var(--ink); background:var(--surface); }
+  .pay-radio{ width:20px; height:20px; border-radius:50%; border:2px solid var(--border); flex:none; position:relative; }
+  .pay-option.active .pay-radio{ border-color:var(--ink); }
+  .pay-option.active .pay-radio::after{ content:''; position:absolute; inset:3px; border-radius:50%; background:var(--ink); }
+  .pay-option .pico{ font-size:20px; flex:none; }
+  .pay-option b{ font-size:14px; }
+  .pay-option small{ display:block; color:var(--ink-muted); font-size:12px; }
+
+  .field{ margin-top:12px; }
+  .field label{ font-size:12px; color:var(--ink-muted); font-weight:600; display:block; margin-bottom:6px; }
+  .field input{ width:100%; border:1px solid var(--border); background:var(--surface); border-radius:12px; padding:13px 14px; font-size:14.5px; color:var(--ink); font-family:'Inter'; }
+  .field input:focus{ outline:2px solid var(--amber); outline-offset:1px; }
+  .field-row{ display:flex; gap:10px; }
+
+  .pix-box{ margin-top:16px; background:var(--surface); border:1px dashed var(--border); border-radius:16px; padding:20px; text-align:center; }
+  .pix-qr{ width:150px; height:150px; margin:0 auto 12px; border-radius:12px; }
+  .pix-code{ font-size:11.5px; background:var(--surface-2); padding:10px; border-radius:10px; word-break:break-all; color:var(--ink-muted); margin-top:10px; }
+
+  /* confirmation */
+  .confirm-wrap{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:40px 20px 0; }
+  .check-circle{ width:84px; height:84px; border-radius:50%; background:var(--success-soft); display:flex; align-items:center; justify-content:center; }
+  .check-circle svg{ width:40px; height:40px; }
+  .check-circle path{ stroke:var(--success); stroke-width:3; fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:40; stroke-dashoffset:40; animation: draw .5s .1s ease forwards; }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+
+  .receipt{ width:100%; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:20px; margin-top:26px; text-align:left; }
+  .receipt-pro{ display:flex; gap:12px; align-items:center; padding-bottom:16px; border-bottom:1px dashed var(--border); }
+
+  /* empty state */
+  .empty{ text-align:center; padding:60px 30px; color:var(--ink-muted); }
+  .empty .ico{ font-size:34px; margin-bottom:10px; }
+
+  /* bottom nav */
+  .bottom-nav{ position:fixed; left:0; right:0; bottom:0; z-index:10; background:var(--surface); border-top:1px solid var(--border); padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px)); }
+  .bottom-nav-inner{ max-width:480px; margin:0 auto; display:flex; }
+  .nav-btn{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; background:none; border:none; cursor:pointer; color:var(--ink-muted); padding:6px 0; }
+  .nav-btn svg{ width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; }
+  .nav-btn span{ font-size:10.5px; font-weight:600; }
+  .nav-btn.active{ color:var(--ink); }
+  .nav-btn.active svg{ stroke-width:2.2; }
+
+  .booking-item{ background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:16px; margin-top:12px; display:flex; gap:12px; align-items:center; }
+  .booking-when{ flex:none; text-align:center; background:var(--surface-2); border-radius:12px; padding:8px 10px; }
+  .booking-when .m{ font-size:10px; text-transform:lowercase; color:var(--ink-muted); }
+  .booking-when .d{ font-size:17px; font-weight:700; }
+
+  .profile-card{ text-align:center; padding:30px 20px 10px; }
+  .profile-avatar{ width:78px; height:78px; border-radius:50%; margin:0 auto 12px; }
+  .settings-row{ display:flex; align-items:center; justify-content:space-between; padding:15px 4px; border-bottom:1px solid var(--border); font-size:14.5px; }
+  .settings-row .l{ display:flex; align-items:center; gap:12px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------------- PWA install plumbing (best-effort; degrades gracefully) ---------------- */
+  try{
+    var manifest = {
+      name:"Marca aí — beleza perto de você",
+      short_name:"Marca aí",
+      start_url:".",
+      display:"standalone",
+      background_color:"#14161F",
+      theme_color:"#14161F",
+      icons:[]
+    };
+    var manifestBlob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
+    document.getElementById('manifest-link').href = URL.createObjectURL(manifestBlob);
+  }catch(e){ /* manifest unsupported in this context — app still works */ }
+
+  try{
+    if('serviceWorker' in navigator){
+      var swCode = "self.addEventListener('fetch',function(e){});";
+      var swBlob = new Blob([swCode],{type:'text/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){});
+    }
+  }catch(e){ /* service worker unavailable — app still works fully online */ }
+
+  /* ---------------- data ---------------- */
+  var CATEGORIES = [
+    { id:'corte-masculino', label:'Corte masculino', icon:'✂️', role:'Barbeiro', subs:[
+      {id:'low-fade', label:'Low fade', desc:'Degradê baixo, acabamento na navalha'},
+      {id:'degrade-navalhado', label:'Degradê navalhado', desc:'Transição marcada, linhas definidas'},
+      {id:'corte-social', label:'Corte social', desc:'Clássico, tesoura e máquina'},
+      {id:'undercut', label:'Undercut', desc:'Laterais raspadas, topo longo'},
+      {id:'corte-barba', label:'Corte + barba', desc:'Combo completo'}
+    ]},
+    { id:'barba', label:'Barba', icon:'🧔', role:'Barbeiro', subs:[
+      {id:'barba-completa', label:'Barba completa', desc:'Desenho, toalha quente e acabamento'},
+      {id:'aparar-barba', label:'Aparar barba', desc:'Manutenção rápida'},
+      {id:'desenho-barba', label:'Desenho de barba', desc:'Contorno com navalha'},
+      {id:'barboterapia', label:'Barboterapia', desc:'Hidratação e modelagem'}
+    ]},
+    { id:'cabelo-feminino', label:'Cabelo feminino', icon:'💇', role:'Cabeleireira', subs:[
+      {id:'corte-feminino', label:'Corte feminino', desc:'Repicado, chanel ou personalizado'},
+      {id:'escova', label:'Escova', desc:'Modelagem e brilho'},
+      {id:'hidratacao', label:'Hidratação', desc:'Tratamento profundo'},
+      {id:'coloracao', label:'Coloração', desc:'Cor, luzes ou mechas'},
+      {id:'penteado', label:'Penteado', desc:'Para eventos e festas'}
+    ]},
+    { id:'manicure', label:'Manicure', icon:'💅', role:'Manicure', subs:[
+      {id:'manicure-simples', label:'Manicure simples', desc:'Lixamento, cutícula e esmalte'},
+      {id:'esmaltacao-gel', label:'Esmaltação em gel', desc:'Longa duração e brilho'},
+      {id:'pedicure', label:'Pedicure', desc:'Cuidado completo para os pés'},
+      {id:'unha-gel', label:'Unha em gel', desc:'Alongamento e modelagem'}
+    ]},
+    { id:'maquiagem', label:'Maquiagem', icon:'💄', role:'Maquiadora', subs:[
+      {id:'maquiagem-social', label:'Maquiagem social', desc:'Para festas e eventos'},
+      {id:'maquiagem-noiva', label:'Maquiagem para noiva', desc:'Prova incluída'},
+      {id:'automaquiagem', label:'Aula de automaquiagem', desc:'Aprenda técnicas pessoais'},
+      {id:'maquiagem-artistica', label:'Maquiagem artística', desc:'Ensaios e produções'}
+    ]}
+  ];
+  var CAT_BY_ID = {}; CATEGORIES.forEach(function(c){ CAT_BY_ID[c.id]=c; });
+  var AVATAR_PAIRS = [['#C97A1F','#8A4E12'],['#B8536A','#7A2F42'],['#3F6B7D','#264A57'],['#5C7A4A','#3A5230'],['#7A5C9E','#4E3768'],['#B08A3E','#6E5522']];
+
+  function makePro(id,name,catId,subIds,rating,reviews,distance,price,duration,mins){
+    var initials = name.split(' ').map(function(p){return p[0];}).slice(0,2).join('').toUpperCase();
+    var pair = AVATAR_PAIRS[id % AVATAR_PAIRS.length];
+    return { id:id, name:name, category:catId, subs:subIds, role:CAT_BY_ID[catId].role, rating:rating, reviews:reviews, distance:distance, price:price, duration:duration, nextInMins:mins, initials:initials, colorA:pair[0], colorB:pair[1] };
+  }
+
+  var PROFESSIONALS = [
+    makePro(1,'Thiago Ramos','corte-masculino',['low-fade','degrade-navalhado','corte-barba'],4.9,312,0.4,45,40,25),
+    makePro(2,'Diego Alvez','corte-masculino',['low-fade','corte-social','undercut'],4.8,201,0.7,40,35,80),
+    makePro(3,'Bruno Castro','corte-masculino',['degrade-navalhado','undercut','corte-barba'],4.7,158,1.1,50,45,160),
+    makePro(4,'Kaique Souza','corte-masculino',['low-fade','corte-social'],4.6,97,1.4,38,35,45),
+    makePro(5,'Rafael Lima','barba',['barba-completa','desenho-barba','barboterapia'],4.9,244,0.6,35,30,20),
+    makePro(6,'Vinícius Moura','barba',['aparar-barba','desenho-barba'],4.7,132,0.9,25,20,55),
+    makePro(7,'Fernanda Dias','cabelo-feminino',['corte-feminino','escova','penteado'],4.9,410,0.5,80,60,35),
+    makePro(8,'Camila Rocha','cabelo-feminino',['coloracao','hidratacao','escova'],4.8,267,0.8,120,90,140),
+    makePro(9,'Juliana Prado','cabelo-feminino',['corte-feminino','hidratacao'],4.6,89,1.6,70,50,190),
+    makePro(10,'Patrícia Nunes','manicure',['manicure-simples','esmaltacao-gel'],4.9,356,0.3,35,45,15),
+    makePro(11,'Sabrina Tavares','manicure',['pedicure','unha-gel','esmaltacao-gel'],4.7,178,1.0,55,60,70),
+    makePro(12,'Larissa Borges','maquiagem',['maquiagem-social','maquiagem-artistica'],4.9,203,1.2,110,60,200),
+    makePro(13,'Beatriz Farias','maquiagem',['maquiagem-noiva','maquiagem-social'],5.0,94,1.8,280,90,300),
+    makePro(14,'Amanda Vieira','maquiagem',['automaquiagem','maquiagem-social'],4.6,61,2.1,90,75,110)
+  ];
+
+  /* ---------------- state ---------------- */
+  var state = { screen:'home', category:null, sub:null, pro:null, date:0, time:null, payMethod:'pix', card:{number:'',name:'',exp:'',cvv:''}, tab:'inicio' };
+  var history = [];
+
+  function loadBookings(){ try{ var r = localStorage.getItem('marcaai_bookings'); return r? JSON.parse(r):[]; }catch(e){ return []; } }
+  function saveBooking(b){ try{ var list = loadBookings(); list.unshift(b); localStorage.setItem('marcaai_bookings', JSON.stringify(list)); }catch(e){} }
+
+  function go(screen, opts){
+    history.push({screen:state.screen, category:state.category, sub:state.sub, pro:state.pro});
+    Object.assign(state, {screen:screen}, opts||{});
+    window.scrollTo(0,0);
+    render();
+  }
+  function goBack(){
+    var prev = history.pop();
+    if(prev){ Object.assign(state, prev); }
+    else { state.screen='home'; }
+    render();
+  }
+  function setTab(tab){ state.tab = tab; history=[]; state.screen = tab==='inicio'?'home':tab; render(); }
+
+  /* ---------------- helpers ---------------- */
+  var DOW = ['dom','seg','ter','qua','qui','sex','sáb'];
+  var MON = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  function dateAt(offset){ var d = new Date(); d.setDate(d.getDate()+offset); return d; }
+  function fmtNext(mins){
+    if(mins < 60) return 'Hoje, em '+mins+' min';
+    var d = new Date(); d.setMinutes(d.getMinutes()+mins);
+    var todayEnd = new Date(); todayEnd.setHours(23,59,59,0);
+    var label = d <= todayEnd ? 'Hoje' : (mins < 60*24*2 ? 'Amanhã' : DOW[d.getDay()]+' '+d.getDate());
+    var hh = String(d.getHours()).padStart(2,'0'), mm = String(d.getMinutes()).padStart(2,'0');
+    return label+', '+hh+':'+mm;
+  }
+  function seedRand(seed){ var x = Math.sin(seed)*10000; return x - Math.floor(x); }
+  function timeSlots(pro, dayOffset){
+    var slots = []; var startH = dayOffset===0 ? Math.max(9, new Date().getHours()+1) : 9;
+    for(var h=startH; h<19; h++){ for(var m=0; m<60; m+=40){ if(m>=60) continue;
+      var seed = pro.id*97 + dayOffset*31 + h*3 + m;
+      var busy = seedRand(seed) < 0.34;
+      slots.push({ label:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'), busy:busy });
+    }}
+    return slots;
+  }
+  function money(v){ return 'R$ '+v.toString().replace('.',','); }
+  function subLabel(id){ for(var i=0;i<CATEGORIES.length;i++){ for(var j=0;j<CATEGORIES[i].subs.length;j++){ if(CATEGORIES[i].subs[j].id===id) return CATEGORIES[i].subs[j].label; } } return id; }
+  function subCountForCat(catId){ var out={}; CAT_BY_ID[catId].subs.forEach(function(s){ out[s.id]=0; }); PROFESSIONALS.forEach(function(p){ if(p.category===catId){ p.subs.forEach(function(s){ if(out[s]!==undefined) out[s]++; }); }}); return out; }
+  function prosFor(catId, subId){ return PROFESSIONALS.filter(function(p){ return p.category===catId && (!subId || p.subs.indexOf(subId)>-1); }).sort(function(a,b){ return a.distance-b.distance; }); }
+
+  function icon(name){
+    var icons = {
+      home:'<path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h4v-6h2v6h4a1 1 0 0 0 1-1v-9"/>',
+      calendar:'<rect x="4" y="5.5" width="16" height="15" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10h16"/>',
+      user:'<circle cx="12" cy="8.5" r="3.5"/><path d="M4.5 20c1.3-4 4-6 7.5-6s6.2 2 7.5 6"/>',
+      chevron:'<path d="M9 5l7 7-7 7"/>',
+      arrowleft:'<path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/>',
+      pin:'<path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/>',
+      star:'<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8L12 3.5z"/>',
+      calplus:'<rect x="4" y="5.5" width="16" height="15" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10h16M12 13v6M9 16h6"/>',
+      map:'<path d="M9 4 4 6.5v13L9 17l6 3 5-2.5v-13L15 7 9 4Z"/><path d="M9 4v13M15 7v13"/>'
+    };
+    return '<svg viewBox="0 0 24 24">'+(icons[name]||'')+'</svg>';
+  }
+
+  function avatarHTML(p, size){
+    var cls = size==='lg' ? 'avatar avatar-lg' : 'avatar';
+    return '<div class="'+cls+'" style="background:linear-gradient(150deg,'+p.colorA+','+p.colorB+')">'+p.initials+'</div>';
+  }
+
+  /* ---------------- screen renderers ---------------- */
+  function catGridHTML(activeCat){
+    return '<div class="cat-grid">'+CATEGORIES.map(function(c){
+      return '<button class="cat-item'+(activeCat===c.id?' active':'')+'" data-nav="subcats" data-cat="'+c.id+'">'+
+        '<span class="cat-icon">'+c.icon+'</span><span class="cat-label">'+c.label+'</span></button>';
+    }).join('')+'</div>';
+  }
+
+  function proCardHTML(p){
+    var sub = state.sub && p.subs.indexOf(state.sub)>-1 ? state.sub : p.subs[0];
+    return '<div class="pro-card" data-nav="profile" data-pro="'+p.id+'">'+
+      '<div class="pro-top">'+avatarHTML(p)+
+        '<div class="pro-info"><div class="name">'+p.name+'</div><div class="role">'+p.role+' · especialista em '+subLabel(sub)+'</div>'+
+        '<div class="pro-meta"><span class="star">★</span><span>'+p.rating.toFixed(1)+'</span><span>('+p.reviews+')</span><span class="dot"></span><span>'+p.distance.toFixed(1)+' km</span></div></div>'+
+      '</div>'+
+      '<div class="pro-bottom"><span class="slot-pill">'+fmtNext(p.nextInMins)+'</span>'+
+      '<span class="price-tag">'+money(p.price)+' <small>/ '+p.duration+'min</small></span></div></div>';
+  }
+
+  function screenHome(){
+    var top = PROFESSIONALS.slice().sort(function(a,b){return a.distance-b.distance;}).slice(0,6);
+    return ''+
+    '<div class="topbar">'+
+      '<button class="location-pill" data-nav="noop">'+icon('pin').replace('viewBox="0 0 24 24"','viewBox="0 0 24 24" width="15" height="15" style="stroke:currentColor;fill:none;stroke-width:2"')+' Perto de você · <b>Rua Augusta, São Paulo</b></button>'+
+    '</div>'+
+    '<div class="page-pad">'+
+      '<h1 class="display" style="font-size:26px;font-weight:600;margin-top:6px;">Marque seu próximo horário</h1>'+
+      catGridHTML(null)+
+      '<div class="section-title">Profissionais perto de você <span class="count">'+top.length+' disponíveis</span></div>'+
+      '<div class="pro-list">'+top.map(proCardHTML).join('')+'</div>'+
+    '</div>';
+  }
+
+  function screenSubcats(){
+    var cat = CAT_BY_ID[state.category];
+    var counts = subCountForCat(cat.id);
+    return ''+
+    '<div class="topbar"><div class="topbar-row">'+
+      '<button class="back-btn" data-nav="back">'+icon('arrowleft')+'</button>'+
+      '<h2 style="font-size:17px;font-weight:600;">'+cat.icon+' '+cat.label+'</h2><span style="width:38px"></span>'+
+    '</div></div>'+
+    '<div class="page-pad">'+
+      '<p style="color:var(--ink-muted);font-size:13.5px;margin-top:8px;">Escolha o serviço para ver quem atende perto de você.</p>'+
+      '<div class="sub-list">'+cat.subs.map(function(s){
+        return '<button class="sub-row" data-nav="results" data-cat="'+cat.id+'" data-sub="'+s.id+'">'+
+          '<span class="swatch"></span><span class="txt"><b>'+s.label+'</b><small>'+s.desc+'</small></span>'+
+          '<span class="cnt">'+counts[s.id]+'</span><span class="chev">'+icon('chevron')+'</span></button>';
+      }).join('')+'</div>'+
+    '</div>';
+  }
+
+  function screenResults(){
+    var cat = CAT_BY_ID[state.category];
+    var list = prosFor(cat.id, state.sub);
+    return ''+
+    '<div class="topbar">'+
+      '<button class="location-pill" data-nav="noop">'+icon('pin').replace('viewBox="0 0 24 24"','viewBox="0 0 24 24" width="15" height="15" style="stroke:currentColor;fill:none;stroke-width:2"')+' Profissionais próximos</button>'+
+      catGridHTML(cat.id)+
+      (state.sub ? '<div class="filter-chip">'+subLabel(state.sub)+'<button data-nav="clear-sub">✕</button></div>' : '')+
+    '</div>'+
+    '<div class="page-pad">'+
+      '<div class="section-title">'+list.length+' encontrados <span class="count">ordenado por distância</span></div>'+
+      (list.length ? '<div class="pro-list">'+list.map(proCardHTML).join('')+'</div>' :
+        '<div class="empty"><div class="ico">🔍</div>Nenhum profissional encontrado para este filtro por aqui ainda.</div>')+
+    '</div>';
+  }
+
+  function screenProfile(){
+    var p = state.pro;
+    var sub = state.sub && p.subs.indexOf(state.sub)>-1 ? state.sub : p.subs[0];
+    return ''+
+    '<div class="topbar"><div class="topbar-row">'+
+      '<button class="back-btn" data-nav="back">'+icon('arrowleft')+'</button>'+
+      '<h2 style="font-size:15px;font-weight:600;">Perfil</h2><span style="width:38px"></span>'+
+    '</div></div>'+
+    '<div class="page-pad">'+
+      '<div class="profile-hero">'+avatarHTML(p,'lg')+
+        '<div><h1 class="display" style="font-size:21px;font-weight:600;">'+p.name+'</h1>'+
+        '<div class="pro-meta" style="margin-top:6px;"><span class="star">★</span><span>'+p.rating.toFixed(1)+'</span><span>('+p.reviews+' avaliações)</span></div>'+
+        '<div class="pro-meta" style="margin-top:3px;">'+p.role+' · '+p.distance.toFixed(1)+' km de você</div></div>'+
+      '</div>'+
+      '<div class="tag-row">'+p.subs.map(function(s){ return '<span class="tag">'+subLabel(s)+'</span>'; }).join('')+'</div>'+
+      '<div class="service-card"><div><b>'+subLabel(sub)+'</b><small>'+p.duration+' min</small></div><b style="font-size:17px;">'+money(p.price)+'</b></div>'+
+
+      '<div class="section-title" style="margin-top:24px;">Escolha o dia</div>'+
+      '<div class="date-scroll">'+Array.from({length:8}).map(function(_,i){
+        var d = dateAt(i);
+        return '<button class="date-chip'+(state.date===i?' active':'')+'" data-nav="pick-date" data-off="'+i+'">'+
+          '<div class="dow">'+(i===0?'hoje':DOW[d.getDay()])+'</div><div class="dnum">'+d.getDate()+'</div></button>';
+      }).join('')+'</div>'+
+
+      '<div class="section-title">Horários disponíveis</div>'+
+      '<div class="time-grid">'+timeSlots(p, state.date).map(function(t){
+        return '<button class="time-chip'+(state.time===t.label?' active':'')+'" '+(t.busy?'disabled':'')+' data-nav="pick-time" data-t="'+t.label+'">'+t.label+'</button>';
+      }).join('')+'</div>'+
+    '</div>'+
+    '<div class="sticky-cta"><div class="sticky-cta-inner">'+
+      '<div class="amount"><b>'+money(p.price)+'</b><small>'+p.duration+' min</small></div>'+
+      '<button class="btn-primary" '+(state.time?'':'disabled style="opacity:.4"')+' data-nav="to-payment">Confirmar agendamento</button>'+
+    '</div></div>';
+  }
+
+  function screenPayment(){
+    var p = state.pro;
+    return ''+
+    '<div class="topbar"><div class="topbar-row">'+
+      '<button class="back-btn" data-nav="back">'+icon('arrowleft')+'</button>'+
+      '<h2 style="font-size:15px;font-weight:600;">Pagamento</h2><span style="width:38px"></span>'+
+    '</div></div>'+
+    '<div class="page-pad">'+
+      '<div class="summary-card">'+
+        '<div class="summary-row"><span class="k">Serviço</span><span>'+subLabel(state.sub||p.subs[0])+'</span></div>'+
+        '<div class="summary-row"><span class="k">Profissional</span><span>'+p.name+'</span></div>'+
+        '<div class="summary-row"><span class="k">Quando</span><span>'+(state.date===0?'Hoje':DOW[dateAt(state.date).getDay()]+' '+dateAt(state.date).getDate()+' '+MON[dateAt(state.date).getMonth()])+', '+state.time+'</span></div>'+
+        '<div class="summary-row total"><span>Total</span><span>'+money(p.price)+'</span></div>'+
+      '</div>'+
+
+      '<div class="section-title">Forma de pagamento</div>'+
+      '<div class="pay-option'+(state.payMethod==='pix'?' active':'')+'" data-nav="pay-method" data-m="pix"><span class="pico">💠</span><div><b>Pix</b><small>Aprovação imediata</small></div><span class="pay-radio"></span></div>'+
+      '<div class="pay-option'+(state.payMethod==='cartao'?' active':'')+'" data-nav="pay-method" data-m="cartao"><span class="pico">💳</span><div><b>Cartão de crédito</b><small>Visa, Mastercard, Elo</small></div><span class="pay-radio"></span></div>'+
+
+      (state.payMethod==='pix' ?
+        '<div class="pix-box"><svg class="pix-qr" viewBox="0 0 100 100">'+pixQR()+'</svg>'+
+        '<div style="font-size:13px;color:var(--ink-muted);">Escaneie com o app do seu banco</div>'+
+        '<div class="pix-code">00020126580014BR.GOV.BCB.PIX0136marcaai-demo-'+p.id+state.time.replace(':','')+'5204000053039865802BR</div></div>'
+        :
+        '<div class="field"><label>Número do cartão</label><input inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" id="cc-number"></div>'+
+        '<div class="field"><label>Nome impresso no cartão</label><input placeholder="Como está no cartão" id="cc-name"></div>'+
+        '<div class="field field-row"><div style="flex:1;"><label>Validade</label><input placeholder="MM/AA" maxlength="5" id="cc-exp"></div><div style="flex:1;"><label>CVV</label><input inputmode="numeric" maxlength="4" placeholder="000" id="cc-cvv"></div></div>'
+      )+
+    '</div>'+
+    '<div class="sticky-cta"><button class="btn-primary" data-nav="do-pay">Pagar '+money(p.price)+'</button></div>';
+  }
+
+  function pixQR(){
+    var cells=''; var seed=42;
+    for(var y=0;y<11;y++){ for(var x=0;x<11;x++){ seed=(seed*9301+49297)%233280; var on=(seed/233280)>0.52;
+      if((x<3&&y<3)||(x>7&&y<3)||(x<3&&y>7)) on = (x%2===0&&y%2===0)|| (x===1&&y===1);
+      if(on) cells+='<rect x="'+(x*9+2)+'" y="'+(y*9+2)+'" width="8" height="8" fill="var(--ink)"/>';
+    }}
+    return '<rect width="100" height="100" rx="8" fill="var(--surface)"/>'+cells;
+  }
+
+  function screenConfirmation(){
+    var b = state.lastBooking;
+    return '<div class="confirm-wrap">'+
+      '<div class="check-circle"><svg viewBox="0 0 24 24"><path d="M5 13l4.5 4.5L19 7.5"/></svg></div>'+
+      '<h1 class="display" style="font-size:24px;font-weight:600;margin-top:18px;">Agendamento confirmado</h1>'+
+      '<p style="color:var(--ink-muted);font-size:14px;margin-top:6px;max-width:280px;">Você recebeu a confirmação. É só chegar no horário combinado.</p>'+
+      '<div class="receipt">'+
+        '<div class="receipt-pro">'+avatarHTML(b.pro)+'<div><b style="font-size:15px;">'+b.pro.name+'</b><div style="font-size:12.5px;color:var(--ink-muted);margin-top:2px;">'+subLabel(b.sub)+'</div></div></div>'+
+        '<div class="summary-row"><span class="k">Data</span><span>'+b.whenLabel+'</span></div>'+
+        '<div class="summary-row"><span class="k">Horário</span><span>'+b.time+'</span></div>'+
+        '<div class="summary-row"><span class="k">Pagamento</span><span>'+(b.payMethod==='pix'?'Pix':'Cartão de crédito')+' · '+money(b.price)+'</span></div>'+
+        '<div class="summary-row"><span class="k">Código</span><span>#'+b.code+'</span></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:10px;width:100%;margin-top:18px;">'+
+        '<button class="btn-ghost" data-nav="add-cal">'+icon('calplus')+' Adicionar à agenda</button>'+
+      '</div>'+
+      '<div style="width:100%;margin-top:10px;"><button class="btn-primary" data-nav="go-home">Voltar ao início</button></div>'+
+    '</div>';
+  }
+
+  function screenAgenda(){
+    var list = loadBookings();
+    return '<div class="topbar"><h2 class="display" style="font-size:22px;font-weight:600;margin-top:6px;">Sua agenda</h2></div>'+
+    '<div class="page-pad">'+
+      (list.length ? list.map(function(b){
+        return '<div class="booking-item"><div class="booking-when"><div class="m">'+b.monLabel+'</div><div class="d">'+b.dayNum+'</div></div>'+
+          avatarHTML(b.pro)+
+          '<div style="flex:1;min-width:0;"><b style="font-size:14px;">'+subLabel(b.sub)+'</b><div style="font-size:12.5px;color:var(--ink-muted);margin-top:2px;">'+b.pro.name+' · '+b.time+'</div></div>'+
+          '<span class="slot-pill">confirmado</span></div>';
+      }).join('') :
+      '<div class="empty"><div class="ico">🗓️</div>Você ainda não tem agendamentos.<br>Escolha um serviço para marcar o primeiro.</div>')+
+    '</div>';
+  }
+
+  function screenPerfil(){
+    return '<div class="profile-card"><div class="avatar" style="width:78px;height:78px;border-radius:50%;margin:0 auto 12px;font-size:26px;background:linear-gradient(150deg,#C97A1F,#8A4E12);">VC</div>'+
+      '<h2 style="font-size:19px;font-weight:600;">Você</h2><div style="color:var(--ink-muted);font-size:13px;margin-top:2px;">Rua Augusta, São Paulo</div></div>'+
+      '<div class="page-pad" style="margin-top:10px;">'+
+        ['Dados pessoais','Formas de pagamento','Endereços salvos','Notificações','Ajuda'].map(function(t){
+          return '<div class="settings-row"><span class="l">'+t+'</span>'+icon('chevron').replace('viewBox="0 0 24 24"','viewBox="0 0 24 24" width="16" height="16" style="stroke:var(--ink-muted);fill:none;stroke-width:2"')+'</div>';
+        }).join('')+
+      '</div>';
+  }
+
+  function bottomNavHTML(){
+    var tabs = [['inicio','home','Início'],['agenda','calendar','Agenda'],['perfil','user','Perfil']];
+    return '<div class="bottom-nav"><div class="bottom-nav-inner">'+tabs.map(function(t){
+      return '<button class="nav-btn'+(state.tab===t[0]?' active':'')+'" data-tab="'+t[0]+'">'+icon(t[1])+'<span>'+t[2]+'</span></button>';
+    }).join('')+'</div></div>';
+  }
+
+  function render(){
+    var html = '<div class="screen">';
+    switch(state.screen){
+      case 'home': html += screenHome(); break;
+      case 'subcats': html += screenSubcats(); break;
+      case 'results': html += screenResults(); break;
+      case 'profile': html += screenProfile(); break;
+      case 'payment': html += screenPayment(); break;
+      case 'confirmation': html += screenConfirmation(); break;
+      case 'agenda': html += screenAgenda(); break;
+      case 'perfil': html += screenPerfil(); break;
+      default: html += screenHome();
+    }
+    html += '</div>';
+    if(state.screen!=='confirmation') html += bottomNavHTML();
+    document.getElementById('app').innerHTML = html;
+  }
+
+  /* ---------------- event delegation ---------------- */
+  document.getElementById('app').addEventListener('click', function(e){
+    var navEl = e.target.closest('[data-nav]');
+    var tabEl = e.target.closest('[data-tab]');
+    if(tabEl){ setTab(tabEl.getAttribute('data-tab')); return; }
+    if(!navEl) return;
+    var nav = navEl.getAttribute('data-nav');
+
+    if(nav==='noop') return;
+    if(nav==='back'){ goBack(); return; }
+    if(nav==='subcats'){ go('subcats', {category:navEl.getAttribute('data-cat'), sub:null}); return; }
+    if(nav==='results'){ go('results', {category:navEl.getAttribute('data-cat'), sub:navEl.getAttribute('data-sub')}); return; }
+    if(nav==='clear-sub'){ state.sub=null; render(); return; }
+    if(nav==='profile'){
+      var pid = parseInt(navEl.getAttribute('data-pro'),10);
+      var pro = PROFESSIONALS.filter(function(p){return p.id===pid;})[0];
+      go('profile', {pro:pro, date:0, time:null, category: state.category || pro.category});
+      return;
+    }
+    if(nav==='pick-date'){ state.date = parseInt(navEl.getAttribute('data-off'),10); state.time=null; render(); return; }
+    if(nav==='pick-time'){ state.time = navEl.getAttribute('data-t'); render(); return; }
+    if(nav==='to-payment'){ if(!state.time) return; go('payment'); return; }
+    if(nav==='pay-method'){ state.payMethod = navEl.getAttribute('data-m'); render(); return; }
+    if(nav==='do-pay'){
+      var d = dateAt(state.date);
+      var booking = {
+        pro: state.pro, sub: state.sub || state.pro.subs[0], time: state.time,
+        price: state.pro.price, payMethod: state.payMethod,
+        whenLabel: (state.date===0?'Hoje':DOW[d.getDay()]+', '+d.getDate()+' de '+MON[d.getMonth()]),
+        monLabel: MON[d.getMonth()], dayNum: d.getDate(),
+        code: Math.random().toString(36).slice(2,8).toUpperCase(),
+        iso: d.toISOString().slice(0,10)
+      };
+      saveBooking(booking);
+      state.lastBooking = booking;
+      go('confirmation');
+      return;
+    }
+    if(nav==='add-cal'){ addToCalendar(state.lastBooking); return; }
+    if(nav==='go-home'){ setTab('inicio'); return; }
+  });
+
+  function addToCalendar(b){
+    try{
+      var d = new Date(b.iso+'T'+b.time+':00');
+      var end = new Date(d.getTime()+ (b.pro.duration*60000));
+      function fmt(dt){ return dt.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z'; }
+      var ics = 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:'+subLabel(b.sub)+' com '+b.pro.name+'\nDTSTART:'+fmt(d)+'\nDTEND:'+fmt(end)+'\nDESCRIPTION:Agendado pelo Marca ai. Codigo '+b.code+'\nEND:VEVENT\nEND:VCALENDAR';
+      var blob = new Blob([ics],{type:'text/calendar'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'agendamento.ics';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }catch(e){ /* calendar export unavailable */ }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
